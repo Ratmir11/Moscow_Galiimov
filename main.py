@@ -1,7 +1,7 @@
 import sys
 import random
 from PyQt6.QtGui import QPainter, QColor
-from PyQt6.QtWidgets import QWidget, QApplication, QPushButton, QInputDialog
+from PyQt6.QtWidgets import QWidget, QApplication, QPushButton
 
 
 class RandomFlag(QWidget):
@@ -34,7 +34,7 @@ class RandomFlag(QWidget):
 
     def draw_elipse(self, qp):
         r = random.randint(10, 400)
-        qp.setBrush(QColor(255, 255, 0))
+        qp.setBrush(QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
         qp.drawEllipse(20, 20, r, r)
 
 
