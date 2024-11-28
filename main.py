@@ -1,45 +1,75 @@
 import sys
-import random
-from PyQt6.QtGui import QPainter, QColor
-from PyQt6.QtWidgets import QWidget, QApplication, QPushButton
+import sqlite3
+from PyQt6 import QtWidgets, uic
+from PyQt6.QtWidgets import QTableWidgetItem
+import sqlite3
 
 
-class RandomFlag(QWidget):
+def create_table():
+    conn = sqlite3.connect('coffee.sqlite')
+    cursor = conn.cursor()
+
+    # Создание таблицы coffee
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS coffee (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        roast_degree TEXT,
+        ground_or_beans TEXT,
+        taste_description TEXT,
+        price REAL,
+        package_volume REAL
+    )
+    ''')
+
+    # Вставка начальных данных
+    cursor.execute('''
+    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
+    VALUES ('Arabica', 'Medium', 'Ground', 'Smooth and balanced', 10.99, 250)
+    ''')
+
+    cursor.execute('''
+    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
+    VALUES ('Robusta', 'Dark', 'Beans', 'Strong and bold', 12.99, 500)
+    ''')
+
+    cursor.execute('''
+    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
+    VALUES ('Liberica', 'Light', 'Ground', 'Mild and sweet', 9.99, 300)
+    ''')
+
+    conn.commit()
+    conn.close()
+
+
+create_table()
+
+
+class CoffeeApp(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()
-        self.initUI()
+        super(CoffeeApp, self).__init__()
+        uic.loadUi('main.ui', self)
+        self.load_data()
 
-    def initUI(self):
-        self.setGeometry(300, 300, 700, 700)
-        self.setWindowTitle('Рисование')
-        self.button = QPushButton('КНОПКА', self)
-        self.button.move(70, 20)
-        self.do_paint = False
-        self.button.clicked.connect(self.run)
-        self.button.clicked.connect(self.paint)
+    def load_data(self):
+        conn = sqlite3.connect('coffee.sqlite')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM coffee")
+        rows = cursor.fetchall()
+        conn.close()
 
-    def paintEvent(self, event):
-        if self.do_paint:
-            qp = QPainter()
-            qp.begin(self)
-            self.draw_elipse(qp)
-            qp.end()
+        self.tableWidget.setRowCount(len(rows))
+        self.tableWidget.setColumnCount(7)
+        self.tableWidget.setHorizontalHeaderLabels(
+            ["ID", "Название сорта", "Степень обжарки", "Молотый/в зернах", "Описание вкуса", "Цена", "Объем упаковки"])
 
-    def paint(self):
-        self.do_paint = True
-        self.repaint()
-
-    def run(self):
-        self.paint()
-
-    def draw_elipse(self, qp):
-        r = random.randint(10, 400)
-        qp.setBrush(QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
-        qp.drawEllipse(20, 20, r, r)
+        for i, row in enumerate(rows):
+            for j, item in enumerate(row):
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(item)))
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = RandomFlag()
-    ex.show()
+    app = QtWidgets.QApplication(sys.argv)
+    window = CoffeeApp()
+    window.show()
     sys.exit(app.exec())
