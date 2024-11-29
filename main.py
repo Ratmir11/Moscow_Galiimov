@@ -5,46 +5,6 @@ from PyQt6.QtWidgets import QTableWidgetItem
 import sqlite3
 
 
-def create_table():
-    conn = sqlite3.connect('coffee.sqlite')
-    cursor = conn.cursor()
-
-    # Создание таблицы coffee
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS coffee (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        roast_degree TEXT,
-        ground_or_beans TEXT,
-        taste_description TEXT,
-        price REAL,
-        package_volume REAL
-    )
-    ''')
-
-    # Вставка начальных данных
-    cursor.execute('''
-    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
-    VALUES ('Arabica', 'Medium', 'Ground', 'Smooth and balanced', 10.99, 250)
-    ''')
-
-    cursor.execute('''
-    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
-    VALUES ('Robusta', 'Dark', 'Beans', 'Strong and bold', 12.99, 500)
-    ''')
-
-    cursor.execute('''
-    INSERT INTO coffee (name, roast_degree, ground_or_beans, taste_description, price, package_volume)
-    VALUES ('Liberica', 'Light', 'Ground', 'Mild and sweet', 9.99, 300)
-    ''')
-
-    conn.commit()
-    conn.close()
-
-
-create_table()
-
-
 class CoffeeApp(QtWidgets.QMainWindow):
     def __init__(self):
         super(CoffeeApp, self).__init__()
