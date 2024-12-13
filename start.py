@@ -1,19 +1,27 @@
 import sys
 import sqlite3
-from PyQt6 import QtWidgets, uic
+import os
+from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QTableWidgetItem, QMessageBox
 
+# Импорт UI классов
+from release.UI.main_ui import Ui_MainWindow
+from release.UI.addEditCoffee_ui import Ui_Dialog
 
-class CoffeeApp(QtWidgets.QMainWindow):
+
+DB_PATH = os.path.join(os.path.dirname(__file__), 'release', 'data', 'coffee.sqlite')
+
+
+class CoffeeApp(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(CoffeeApp, self).__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
         self.load_data()
         self.addButton.clicked.connect(self.add_coffee)
         self.editButton.clicked.connect(self.edit_coffee)
 
     def load_data(self):
-        conn = sqlite3.connect('coffee.sqlite')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM coffee")
         rows = cursor.fetchall()
@@ -45,11 +53,10 @@ class CoffeeApp(QtWidgets.QMainWindow):
             QMessageBox.warning(self, "Предупреждение", "Выберите запись для редактирования.")
 
 
-
-class AddEditCoffeeForm(QtWidgets.QDialog):
+class AddEditCoffeeForm(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self, parent, coffee_id=None):
         super(AddEditCoffeeForm, self).__init__(parent)
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.coffee_id = coffee_id
         self.buttonBox.accepted.connect(self.save_coffee)
         self.buttonBox.rejected.connect(self.reject)
@@ -58,7 +65,7 @@ class AddEditCoffeeForm(QtWidgets.QDialog):
             self.load_coffee_data()
 
     def load_coffee_data(self):
-        conn = sqlite3.connect('coffee.sqlite')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM coffee WHERE id=?", (self.coffee_id,))
         row = cursor.fetchone()
@@ -80,7 +87,7 @@ class AddEditCoffeeForm(QtWidgets.QDialog):
         price = self.priceEdit.text()
         package_volume = self.packageVolumeEdit.text()
 
-        conn = sqlite3.connect('coffee.sqlite')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
         if self.coffee_id:
