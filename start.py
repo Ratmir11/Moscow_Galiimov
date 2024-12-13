@@ -45,6 +45,7 @@ class CoffeeApp(QtWidgets.QMainWindow):
             QMessageBox.warning(self, "Предупреждение", "Выберите запись для редактирования.")
 
 
+
 class AddEditCoffeeForm(QtWidgets.QDialog):
     def __init__(self, parent, coffee_id=None):
         super(AddEditCoffeeForm, self).__init__(parent)
